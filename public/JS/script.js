@@ -4,6 +4,7 @@ var firebaseConfig = {
     databaseURL: 'https://thrs-652a9.firebaseio.com',
     storageBucket: 'gs://thrs-652a9.appspot.com'
   };
+  
   firebase.initializeApp(firebaseConfig);
 
   var dropZone = $('#upload-container');
@@ -40,11 +41,11 @@ listRef.listAll().then(function(res) {
         li.classList.add("content");
         document.getElementById('list').appendChild(li);
         var a = document.createElement('a');
-        a.setAttribute('download',metadata['name']);
         a.innerHTML=metadata['name'];
         li.appendChild(a);
         storageRef.child(itemRef['_delegate']['_location']['path_']).getDownloadURL().then(function(url) {
-          a.href=url;
+          a.href='#';
+          a.setAttribute('onclick','downloadResource("'+url+'","'+metadata['name']+'")');
         }).catch(function(error) {console.log(error)});
 
         var p = document.createElement('p');
@@ -56,3 +57,27 @@ listRef.listAll().then(function(res) {
     }).catch(function(error) {console.log(error)});
   });
 }).catch(function(error) {console.log(error);});
+
+function forceDownload(blob, filename) {
+  var a = document.createElement('a');
+  a.download = filename;
+  a.href = blob;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+function downloadResource(url, filename) {
+  if (!filename) filename = url.split('\\').pop().split('/').pop().split('?')[0].replace('files%2F','');
+  fetch(url, {
+      headers: new Headers({
+        'Origin': location.origin
+      }),
+      mode: 'cors'
+    })
+    .then(response => response.blob())
+    .then(blob => {
+      let blobUrl = window.URL.createObjectURL(blob);
+      forceDownload(blobUrl, filename);
+    })
+    .catch(e => console.error(e));
+}
