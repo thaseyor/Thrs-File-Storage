@@ -6,14 +6,14 @@ var firebaseConfig = {
   };
   firebase.initializeApp(firebaseConfig);
 
+  var dropZone = $('#upload-container');
   
-  var progressBar=document.getElementById('progress');
-	var dropZone = $('#upload-container');
 	dropZone.on('drop', function(e) {
 		dropZone.removeClass('dragover');
 		let files = e.originalEvent.dataTransfer.files;
 		sendFiles(files);
-	});
+  });
+  
 	setTimeout(function(){ 
 		var fileButton=document.getElementById('file-input');
 		fileButton.addEventListener('change',function(e){
@@ -21,7 +21,6 @@ var firebaseConfig = {
 		sendFiles(files);
 	}); }, 1000);
 	
-
 	function sendFiles(files) {
 		$(files).each(function(index, file) {
 			var storageRef = firebase.storage().ref('files/'+String(file.name));
@@ -29,64 +28,31 @@ var firebaseConfig = {
 		})
 	};
 
-
-// fileButton.addEventListener('change',function(e){
-
-// var file = e.target.files[0];
-// var storageRef = firebase.storage().ref('files/'+String(file.name));
-// var task= storageRef.put(file);
-// task.on('state_changed',
-
-// function progress(snapshot){
-// var percentage = (snapshot.bytesTransferred/snapshot.totalBytes)*100;
-// progressBar.innerHTML=percentage;
-// },
-// function error(err){
-//   console.log(err)
-// },
-// function complete(){
-//   progressBar.innerHTML='Complete!';
-// }
-// );
-// });
-
-
 var storageRef = firebase.storage().ref('');
 var listRef = storageRef.child('files/');
 // Find all the prefixes and items.
 listRef.listAll().then(function(res) {
-  res.prefixes.forEach(function(folderRef) {
-    // All the prefixes under listRef.
-    // You may call listAll() recursively on them.
-  });
   res.items.forEach(function(itemRef) {
+    var MetadataRef = storageRef.child(itemRef['_delegate']['_location']['path_']);
+    // Get metadata properties
+    MetadataRef.getMetadata().then(function(metadata) {
+      var li=document.createElement('li');
+        li.classList.add("content");
+        document.getElementById('list').appendChild(li);
+        var a = document.createElement('a');
+        a.setAttribute('download',metadata['name']);
+        a.innerHTML=metadata['name'];
+        li.appendChild(a);
+        storageRef.child(itemRef['_delegate']['_location']['path_']).getDownloadURL().then(function(url) {
+          a.href=url;
+        }).catch(function(error) {console.log(error)});
 
-	var forestRef = storageRef.child(itemRef['_delegate']['_location']['path_']);
-	
-// Get metadata properties
-forestRef.getMetadata().then(function(metadata) {
-	console.log(metadata);
-}).catch(function(error) {
-  console.log(error)
-});
-
-   
-    var li=document.createElement('li');
-    li.classList.add("content");
-    
-    document.getElementById('list').appendChild(li);
-    li.innerHTML=itemRef['_delegate']['_location']['path_'];
-// <div class='down'>
-// <div class='tex'>
-//     <a href='files/$value'>$var. $value</a>
-//     </div>
-//     <a href='files/$value' class='downloadBox' download><img class='downloadPic'  title='Download' src='./img/upload.svg' /></a>
-//     </div>
-//     $size = filesize("files/".$value);
-//     <p>","Вес: ", ceil($size/8/1024) ,' г', "</p>";
-//      " . date ('m.d.Y H:i',filemtime("./files/$value")), "</br></br>";
-//     </li>
+        var p = document.createElement('p');
+        p.innerHTML='Размер файла: '+Math.round(metadata['size']/1024) + ' Кб';
+        li.appendChild(p);
+        var p = document.createElement('p');
+        p.innerHTML='Дата загрузки: '+metadata['timeCreated'].slice(0,10);;
+        li.appendChild(p);
+    }).catch(function(error) {console.log(error)});
   });
-}).catch(function(error) {
-  console.log(error);
-  });
+}).catch(function(error) {console.log(error);});
