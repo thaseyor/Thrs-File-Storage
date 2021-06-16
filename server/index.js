@@ -1,29 +1,45 @@
-const fastify = require('fastify');
-const dotenv = require('dotenv');
-const { fileURLToPath } = require('url');
-const { dirname, join } = require('path');
-const autoLoad = require('fastify-autoload');
+const fastify = require('fastify')
+const dotenv = require('dotenv')
+const { join } = require('path')
+const autoLoad = require('fastify-autoload')
 
-dotenv.config();
+dotenv.config()
 
-const app = fastify();
+const app = fastify()
+
+app.register(require('fastify-multipart'), {
+  limits: {
+    fieldNameSize: 100, // Max field name size in bytes
+    fieldSize: 100, // Max field value size in bytes
+    fields: 10, // Max number of non-file fields
+    fileSize: 1000000, // For multipart forms, the max file size in bytes
+    files: 5, // Max number of file fields
+    headerPairs: 2000 // Max number of header key=>value pairs
+  }
+})
+
+const WHITE_LIST = process.env.URI_LIST.split(',')
+app.register(import('fastify-cors'), {
+  origin: WHITE_LIST,
+  credentials: true
+})
 
 app.register(autoLoad, {
-  dir: join(__dirname, 'plugins'),
-});
+  dir: join(__dirname, 'plugins')
+})
 
 app.register(autoLoad, {
   dir: join(__dirname, 'routes'),
-  routeParams: true,
-});
+  routeParams: true
+})
 
-app.get('/', function (req, reply) {
-  reply.send({ message: 'aboba' });
-});
+app.get('/', function(req, reply) {
+  reply.send({ message: 'aboba' })
+})
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000
 
-app.listen(PORT, '0.0.0.0', (err) => {
-  if (err) return console.error(err);
-  console.log(`App listens http://localhost:${PORT}`);
-});
+app.listen(PORT, '0.0.0.0', err => {
+  if (err) return console.error(err)
+  console.log(`App listens http://localhost:${PORT}`)
+})
