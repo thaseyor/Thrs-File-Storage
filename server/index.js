@@ -9,11 +9,11 @@ const app = fastify()
 
 app.register(require('fastify-multipart'), {
   limits: {
-    fieldNameSize: 100, // Max field name size in bytes
-    fieldSize: 100, // Max field value size in bytes
-    fields: 10, // Max number of non-file fields
-    fileSize: 1000000, // For multipart forms, the max file size in bytes
-    files: 5, // Max number of file fields
+    fieldNameSize: 0, // Max field name size in bytes
+    fieldSize: 0, // Max field value size in bytes
+    fields: 0, // Max number of non-file fields
+    fileSize: 100_000_000, // For multipart forms, the max file size in bytes
+    files: 1, // Max number of file fields
     headerPairs: 2000 // Max number of header key=>value pairs
   }
 })

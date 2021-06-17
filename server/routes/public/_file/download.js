@@ -8,7 +8,7 @@ module.exports = async function(fastify) {
 
     // Get a v2 signed URL for the file
     const [url] = await fastify.storage
-      .file('files/' + req.params.file)
+      .file('public/' + req.params.file)
       .getSignedUrl(options)
 
     reply.send(url)
