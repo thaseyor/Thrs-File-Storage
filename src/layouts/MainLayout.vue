@@ -1,9 +1,6 @@
 <template>
   <div>
-    <header
-      class="z-top s"
-      style="position: sticky;top: 0;background-color:white"
-    >
+    <header style="position: sticky;top: 0;background-color:white">
       <q-tabs v-model="tab" class="text-primary">
         <q-tab name="public" icon="delete" label="Public" />
         <q-tab name="private" icon="lock" label="Private" />
@@ -47,6 +44,17 @@
               </p>
               <q-card-actions align="right">
                 <q-btn
+                  v-if="
+                    file.contentType &&
+                      file.contentType.split('/')[0] === 'image'
+                  "
+                  @click="showImage(file.name)"
+                  flat
+                  round
+                  color="blue"
+                  icon="open_in_new"
+                />
+                <q-btn
                   @click="downloadFile(file.name)"
                   flat
                   round
@@ -64,6 +72,10 @@
             </q-card-section>
           </q-card>
         </div>
+
+        <q-dialog v-model="modal" class="z-top">
+          <q-img :src="currentImage" />
+        </q-dialog>
       </q-tab-panel>
 
       <q-tab-panel name="private">
@@ -84,6 +96,8 @@ export default defineComponent({
   name: 'MainLayout',
   setup() {
     const tab = ref('public')
+    const modal = ref(false)
+    const currentImage = ref('')
     const files = ref([])
 
     onMounted(async () => {
@@ -110,6 +124,7 @@ export default defineComponent({
       files.value = files.value.filter(el => el.name !== file)
       Notify.create(data.message)
     }
+
     const addFile = async info => {
       const res = JSON.parse(info.xhr.response)
       files.value.push(res.file)
@@ -123,10 +138,17 @@ export default defineComponent({
       a.click()
       a.remove()
     }
+
     const uploadURI = process.env.QENV_SERVER_URI + '/public'
 
     const formatDate = date => {
       return formatDistanceToNow(new Date(date))
+    }
+
+    const showImage = async image => {
+      modal.value = true
+      const { data: url } = await api(`public/${image}`)
+      currentImage.value = url
     }
 
     return {
@@ -136,7 +158,10 @@ export default defineComponent({
       deleteFile,
       addFile,
       uploadURI,
-      formatDate
+      formatDate,
+      modal,
+      showImage,
+      currentImage
     }
   }
 })
