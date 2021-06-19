@@ -43,7 +43,27 @@ module.exports = async function(fastify) {
 
       const { accessToken, refreshToken } = await fastify.generateTokens(login)
 
-      reply.code(200).send({ accessToken, refreshToken, statusCode: 200 })
+      const url = new URL(process.env.FRONTEND_URI)
+      const year = 60 * 60 * 24 * 365
+
+      reply.setCookie('accessToken', accessToken, {
+        path: '/',
+        sameSite: 'strict',
+        httpOnly: true,
+        secure: true,
+        domain: url.hostname,
+        maxAge: year
+      })
+      reply.setCookie('refreshToken', refreshToken, {
+        path: '/',
+        sameSite: 'strict',
+        httpOnly: true,
+        secure: true,
+        domain: url.hostname,
+        maxAge: year
+      })
+
+      reply.code(200).send({ message: 'OK', statusCode: 200 })
     }
   )
 }

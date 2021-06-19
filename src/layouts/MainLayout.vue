@@ -79,8 +79,9 @@
       </q-tab-panel>
 
       <q-tab-panel name="private">
-        <div class="text-h6">Alarms</div>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit.
+        <section v-if="!logined" style="display: flex; justify-content: center">
+          <auth-panel @logined="logined = true" />
+        </section>
       </q-tab-panel>
     </q-tab-panels>
   </div>
@@ -88,20 +89,24 @@
 
 <script>
 import { defineComponent, ref, onMounted } from '@vue/composition-api'
-import { api } from '../includes/api'
+import { api, axios } from '../includes/api'
 import { Notify } from 'quasar'
 import { formatDistanceToNow } from 'date-fns'
+import FileDownload from 'js-file-download'
+import AuthPanel from 'src/components/AuthPanel.vue'
 
 export default defineComponent({
+  components: { AuthPanel },
   name: 'MainLayout',
   setup() {
     const tab = ref('public')
     const modal = ref(false)
     const currentImage = ref('')
     const files = ref([])
+    const logined = ref(window.localStorage.getItem('logined') || false)
 
     onMounted(async () => {
-      const { data } = await api('public').catch(res => console.log(res))
+      const { data } = await api('public')
 
       files.value = data
     })
@@ -111,11 +116,12 @@ export default defineComponent({
 
       const { data: url } = await api(`public/${file}`)
 
-      fetch(url)
-        .then(response => response.blob())
-        .then(blob => {
-          const blobUrl = window.URL.createObjectURL(blob)
-          forceDownload(blobUrl, file)
+      await axios
+        .get(url, {
+          responseType: 'blob'
+        })
+        .then(res => {
+          FileDownload(res.data, file)
         })
     }
 
@@ -128,15 +134,6 @@ export default defineComponent({
     const addFile = async info => {
       const res = JSON.parse(info.xhr.response)
       files.value.push(res.file)
-    }
-
-    const forceDownload = (blob, filename) => {
-      const a = document.createElement('a')
-      a.download = filename
-      a.href = blob
-      document.body.appendChild(a)
-      a.click()
-      a.remove()
     }
 
     const uploadURI = process.env.QENV_SERVER_URI + '/public'
@@ -161,7 +158,8 @@ export default defineComponent({
       formatDate,
       modal,
       showImage,
-      currentImage
+      currentImage,
+      logined
     }
   }
 })

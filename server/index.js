@@ -18,26 +18,41 @@ app.register(require('fastify-multipart'), {
   }
 })
 
-const WHITE_LIST = process.env.URI_LIST.split(',')
+const WHITE_LIST = process.env.FRONTEND_URI
 app.register(import('fastify-cors'), {
   origin: WHITE_LIST,
   credentials: true
+})
+
+app.register(require('fastify-cookie'), {
+  secret: process.env.COOKIE_SECRET
 })
 
 app.register(autoLoad, {
   dir: join(__dirname, 'plugins')
 })
 
+app.addSchema({
+  $id: 'cookies',
+  type: 'object',
+  required: ['cookie'],
+  properties: {
+    cookie: {
+      type: 'string',
+      pattern: '(?=.*refreshToken=)(?=.*accessToken=)'
+    }
+  }
+})
 app.register(autoLoad, {
   dir: join(__dirname, 'routes'),
   routeParams: true
 })
 
-app.get('/', function(req, reply) {
-  reply.send({ message: 'aboba' })
-})
-
 const PORT = process.env.PORT || 3000
+
+app.ready(() => {
+  console.log(app.printRoutes({ commonPrefix: false }))
+})
 
 app.listen(PORT, '0.0.0.0', err => {
   if (err) return console.error(err)

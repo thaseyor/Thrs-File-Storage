@@ -1,3 +1,7 @@
 import axios from 'axios'
 
-export const api = axios.create({ baseURL: process.env.QENV_SERVER_URI })
+export const api = axios.create({
+  baseURL: process.env.QENV_SERVER_URI,
+  withCredentials: true
+})
+export { axios }
