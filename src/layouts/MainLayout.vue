@@ -12,7 +12,6 @@
         <storage-area type="public" />
       </q-tab-panel>
       <q-tab-panel name="private">
-        {{ logined }}
         <storage-area v-if="logined" type="private" @logout="logout()" />
         <section v-else style="display: flex; justify-content: center">
           <auth-panel @logined="logined = true" />
