@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "File storage",
   "scripts": {
+    "heroku-postbuild": "echo Skip builds on Heroku",
     "server": "nodemon server/index.js",
     "dev": "quasar dev",
     "build": "quasar build",

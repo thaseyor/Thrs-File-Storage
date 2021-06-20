@@ -8,7 +8,6 @@ module.exports = async function(fastify) {
     async function(req, reply) {
       const token = req.cookies.refreshToken
 
-      console.log(token)
       const { login } = await fastify.verifyToken(
         token,
         process.env.REFRESH_TOKEN
