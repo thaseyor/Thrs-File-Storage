@@ -1,10 +1,12 @@
 const humanFileSize = require('../../utils/humanFileSize.js')
 
 module.exports = async function(fastify) {
+  const headers = fastify.getSchema('cookies')
   fastify.get(
     '',
     {
       schema: {
+        headers,
         response: {
           200: {
             type: 'array',
@@ -23,6 +25,11 @@ module.exports = async function(fastify) {
       }
     },
     async function(req, reply) {
+      const { login } = await fastify.verifyToken(
+        req.cookies.accessToken,
+        process.env.ACCESS_TOKEN
+      )
+
       const [files] = await fastify.bucket.getFiles()
 
       const publicFiles = []
@@ -30,12 +37,12 @@ module.exports = async function(fastify) {
       files.forEach(file => {
         const filename = file.name.split('/')
         const data = file.metadata
-        if (filename[0] === 'public' && filename[1]) {
+        if (filename[0] === 'private' && filename[1] === login && filename[2]) {
           publicFiles.push({
-            name: filename[1],
+            name: filename[2],
             size: humanFileSize(data.size),
             uploaded: data.timeCreated,
-            contentType: data.contentType || 'Unknown type'
+            contentType: data.contentType
           })
         }
       })

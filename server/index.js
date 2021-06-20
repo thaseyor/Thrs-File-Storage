@@ -43,6 +43,7 @@ app.addSchema({
     }
   }
 })
+
 app.register(autoLoad, {
   dir: join(__dirname, 'routes'),
   routeParams: true

@@ -24,6 +24,7 @@ module.exports = fp(async function(fastify) {
   const db = admin.firestore()
   fastify.decorate('db', db.collection('users'))
 
-  const storage = admin.storage().bucket()
-  fastify.decorate('storage', storage)
+  const bucket = admin.storage().bucket()
+
+  fastify.decorate('bucket', bucket)
 })

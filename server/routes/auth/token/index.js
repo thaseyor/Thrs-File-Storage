@@ -1,20 +1,14 @@
 module.exports = async function(fastify) {
+  const headers = fastify.getSchema('cookies')
   fastify.post(
     '',
     {
-      schema: {
-        body: {
-          type: 'object',
-          required: ['refreshToken'],
-          properties: {
-            refreshToken: { type: 'string' }
-          }
-        }
-      }
+      schema: { headers }
     },
     async function(req, reply) {
-      const token = req.body.refreshToken
+      const token = req.cookies.refreshToken
 
+      console.log(token)
       const { login } = await fastify.verifyToken(
         token,
         process.env.REFRESH_TOKEN
@@ -27,7 +21,13 @@ module.exports = async function(fastify) {
           fastify.redis.keys(`${login}*`, function(err, res) {
             res.forEach(refToken => fastify.redis.del(refToken))
           })
-          reply.code(403).send({ message: 'Token is invalid', statusCode: 403 })
+          reply.clearCookie('accessToken')
+          reply.clearCookie('refreshToken')
+          reply.code(403).send({
+            action: 'logout',
+            message: 'Token is invalid',
+            statusCode: 403
+          })
           return
         }
 
@@ -37,7 +37,27 @@ module.exports = async function(fastify) {
           login
         )
 
-        reply.send({ accessToken, refreshToken, statusCode: 200 })
+        const url = new URL(process.env.FRONTEND_URI)
+        const year = 60 * 60 * 24 * 365
+
+        reply.setCookie('accessToken', accessToken, {
+          path: '/',
+          sameSite: 'strict',
+          httpOnly: true,
+          secure: true,
+          domain: url.hostname,
+          maxAge: year
+        })
+        reply.setCookie('refreshToken', refreshToken, {
+          path: '/',
+          sameSite: 'strict',
+          httpOnly: true,
+          secure: true,
+          domain: url.hostname,
+          maxAge: year
+        })
+
+        reply.send({ message: 'OK', statusCode: 200 })
       })
     }
   )

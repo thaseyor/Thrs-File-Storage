@@ -7,10 +7,10 @@ module.exports = async function(fastify) {
     }
 
     // Get a v2 signed URL for the file
-    const [url] = await fastify.storage
+    const [url] = await fastify.bucket
       .file('public/' + req.params.file)
       .getSignedUrl(options)
 
-    reply.send(url)
+    reply.send({ url, message: 'OK', statusCode: 200 })
   })
 }
