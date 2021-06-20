@@ -157,7 +157,7 @@ export default defineComponent({
       files.value.push(res.file)
     }
 
-    const uploadURI = process.env.QENV_SERVER_URI + `/${type}`
+    const uploadURI = process.env.SERVER_URI + `/${type}`
 
     const formatDate = date => {
       return formatDistanceToNow(new Date(date))
