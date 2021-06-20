@@ -45,7 +45,7 @@ module.exports = async function(fastify) {
       const [metadata] = await file.getMetadata()
       reply.send({
         file: {
-          name: metadata.name.split('/')[1],
+          name: metadata.name.split('/')[2],
           size: humanFileSize(metadata.size),
           uploaded: metadata.timeCreated,
           contentType: metadata.contentType || 'Unknown type'
