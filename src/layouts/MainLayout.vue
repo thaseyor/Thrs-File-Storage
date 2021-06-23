@@ -1,14 +1,14 @@
 <template>
   <div>
-    <header style="position: sticky;top: 0;background-color:white">
-      <q-tabs v-model="tab" class="text-primary">
+    <header style="position: sticky;top: 0;z-index:40" class="bg-grey-10">
+      <q-tabs v-model="tab" class="text-grey-5">
         <q-tab name="public" icon="delete" label="Public" />
         <q-tab name="private" icon="lock" label="Private" />
       </q-tabs>
       <q-separator />
     </header>
-    <q-tab-panels v-model="tab" animated>
-      <q-tab-panel name="public" style="overflow:hidden">
+    <q-tab-panels v-model="tab" animated class="transparent">
+      <q-tab-panel dark name="public" style="overflow:hidden">
         <storage-area type="public" />
       </q-tab-panel>
       <q-tab-panel name="private">

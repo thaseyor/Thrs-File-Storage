@@ -1,68 +1,63 @@
 <template>
   <div>
-    <section style="display: flex; justify-content: center">
+    <section style="display: flex; justify-content: center" class="text-grey-5">
       <q-uploader
         :url="uploadURI"
         label="Upload files"
         multiple
+        dark
+        color="grey-10"
+        text-color="grey-5"
         with-credentials
         @uploaded="addFile"
-        style="max-width: 300px"
+        style="width: 400px"
       />
     </section>
-    <div
-      class="full-width row wrap  items-center content-center q-gutter-md q-pt-md"
-      v-if="files.length"
-    >
-      <q-card class="my-card" v-for="(file, key) in files" :key="key">
-        <q-card-section>
-          <p
-            class="text-subtitle1"
-            style="text-overflow: ellipsis;white-space: nowrap;overflow: hidden;"
-          >
-            {{ file.name }}
-            <q-tooltip
-              v-if="file.name.length > 31"
-              anchor="top middle"
-              self="bottom middle"
-              :offset="[10, 10]"
-            >
+    <div class="row wrapq-pt-md q-col-gutter-lg q-pt-md" v-if="files.length">
+      <div
+        class="col-xs-12 col-sm-6 col-lg-3"
+        v-for="(file, key) in files"
+        :key="key"
+      >
+        <q-card class="text-grey-5" dark>
+          <q-card-section>
+            <p class="text-subtitle1 ellipsis">
               {{ file.name }}
-            </q-tooltip>
-          </p>
-          <p>File size: {{ file.size }}</p>
-          <p>
-            Uploaded:
-            {{ formatDate(file.uploaded) }}
-          </p>
-          <q-card-actions align="right">
-            <q-btn
-              v-if="
-                file.contentType && file.contentType.split('/')[0] === 'image'
-              "
-              @click="showImage(file.name)"
-              flat
-              round
-              color="blue"
-              icon="open_in_new"
-            />
-            <q-btn
-              @click="downloadFile(file.name)"
-              flat
-              round
-              color="blue"
-              icon="download"
-            />
-            <q-btn
-              @click="deleteFile(file.name)"
-              flat
-              round
-              color="blue"
-              icon="delete"
-            />
-          </q-card-actions>
-        </q-card-section>
-      </q-card>
+              <q-tooltip
+                v-if="file.name.length > 31"
+                anchor="top middle"
+                self="bottom middle"
+                :offset="[10, 10]"
+              >
+                {{ file.name }}
+              </q-tooltip>
+            </p>
+            <p>File size: {{ file.size }}</p>
+            <p>
+              Uploaded:
+              {{ formatDate(file.uploaded) }}
+            </p>
+            <q-card-actions align="right">
+              <q-btn
+                v-if="
+                  file.contentType && file.contentType.split('/')[0] === 'image'
+                "
+                @click="showImage(file.name)"
+                flat
+                round
+                icon="open_in_new"
+              />
+              <q-btn
+                @click="downloadFile(file.name)"
+                flat
+                round
+                icon="download"
+              />
+              <q-btn @click="deleteFile(file.name)" flat round icon="delete" />
+            </q-card-actions>
+          </q-card-section>
+        </q-card>
+      </div>
     </div>
     <div
       v-else-if="loading === false"
@@ -74,10 +69,12 @@
       v-else
       class="text-h6 fit row wrap justify-center items-center content-start q-mt-xl"
     >
-      <q-spinner color="primary" size="3em" />
+      <q-spinner color="grey-5" size="3em" />
     </div>
-    <q-dialog v-model="modal" class="z-top">
-      <q-img :src="currentImage" />
+    <q-dialog v-model="modal" style="z-index:50">
+      <pinch-zoom :limitZoom="3" :disableZoomControl="'disable'">
+        <img :src="currentImage" />
+      </pinch-zoom>
     </q-dialog>
   </div>
 </template>
@@ -186,9 +183,3 @@ export default defineComponent({
   }
 })
 </script>
-<style lang="sass" scoped>
-.my-card
-  width: 100%
-  max-width: 350px
-  height: 190px
-</style>
