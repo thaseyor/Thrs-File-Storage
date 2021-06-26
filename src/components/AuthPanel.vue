@@ -1,15 +1,20 @@
 <template>
   <div>
-    <p class="text-h6">
-      You have to login in order to gain an access to your storage
-    </p>
-
-    <q-tabs v-model="tab" dense align="justify">
-      <q-tab name="login" icon="login" label="Login" />
-      <q-tab name="signup" icon="app_registration" label="Signup" />
-    </q-tabs>
-
-    <q-tab-panels v-model="tab">
+    <section class="text-grey-5 q-mt-lg" style="background-color:#1d1d1d">
+      <q-tabs v-model="tab" class="q-pb-lg" dense align="justify" dark>
+        <q-tab name="login" icon="login" class="q-pt-xs" label="Login" />
+        <q-tab
+          name="signup"
+          class="q-pt-xs"
+          icon="app_registration"
+          label="Signup"
+        />
+      </q-tabs>
+      <div class="text-h6 q-px-md text-center">
+        You have to login in order to gain an access to your storage
+      </div>
+    </section>
+    <q-tab-panels v-model="tab" dark class="text-grey-5">
       <q-tab-panel name="login">
         <q-form @submit="auth('login', user)" class="q-gutter-md q-pt-md">
           <q-input
@@ -18,6 +23,8 @@
             label="Login"
             lazy-rules
             :rules="[val => (val && val.length > 0) || 'Please type something']"
+            dark
+            color="text-grey-5"
           />
 
           <q-input
@@ -26,6 +33,8 @@
             label="Password"
             type="password"
             lazy-rules
+            dark
+            color="text-grey-5"
             :rules="[
               val =>
                 (val !== null &&
@@ -37,7 +46,12 @@
           />
 
           <div>
-            <q-btn label="Submit" type="submit" color="primary" />
+            <q-btn
+              label="Submit"
+              type="submit"
+              color="grey-9"
+              text-color="grey-5"
+            />
           </div>
         </q-form>
       </q-tab-panel>
@@ -48,6 +62,8 @@
             filled
             v-model="newUser.login"
             label="Login"
+            dark
+            color="text-grey-5"
             lazy-rules
             :rules="[val => (val && val.length > 0) || 'Please type something']"
           />
@@ -57,6 +73,8 @@
             type="password"
             v-model="newUser.password"
             label="Password"
+            dark
+            color="text-grey-5"
             lazy-rules
             :rules="[
               val =>
@@ -73,6 +91,8 @@
             v-model="newUser.confirmPassword"
             label="Confirm Password"
             type="password"
+            dark
+            color="text-grey-5"
             lazy-rules
             :rules="[
               val =>
@@ -85,7 +105,12 @@
             ]"
           />
           <div>
-            <q-btn label="Submit" type="submit" color="primary" />
+            <q-btn
+              label="Submit"
+              type="submit"
+              color="grey-9"
+              text-color="grey-5"
+            />
           </div>
         </q-form>
       </q-tab-panel>
