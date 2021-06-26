@@ -6,7 +6,9 @@
     "heroku-postbuild": "echo Skip builds on Heroku",
     "server": "nodemon server/index.js",
     "dev": "quasar dev",
+    "dev:pwa": "quasar dev -m pwa",
     "build": "quasar build",
+    "build:pwa": "quasar build -m pwa",
     "lint": "eslint --ext .js,.vue ./",
     "test": "echo \"No test specified\" && exit 0"
   },
@@ -28,7 +30,8 @@
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-vue": "^7.7.0",
     "eslint-webpack-plugin": "^2.4.0",
-    "nodemon": "^2.0.7"
+    "nodemon": "^2.0.7",
+    "workbox-webpack-plugin": "^5.0.0"
   },
   "browserslist": [
     "last 10 Chrome versions",
