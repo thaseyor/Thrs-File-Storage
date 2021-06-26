@@ -72,7 +72,11 @@
       <q-spinner color="grey-5" size="3em" />
     </div>
     <q-dialog v-model="modal" style="z-index:50">
-      <pinch-zoom :limitZoom="3" :disableZoomControl="'disable'">
+      <pinch-zoom
+        :limitZoom="3"
+        style="cursor:move"
+        :disableZoomControl="'disable'"
+      >
         <img :src="currentImage" />
       </pinch-zoom>
     </q-dialog>
