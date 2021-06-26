@@ -1,15 +1,19 @@
 module.exports = async function(fastify) {
   const headers = fastify.getSchema('cookies')
   fastify.delete('', { schema: { headers } }, async function(req, reply) {
+    const url = new URL(process.env.FRONTEND_URI)
+
     reply.clearCookie('accessToken', {
       path: '/',
       sameSite: 'strict',
       httpOnly: true,
+      domain: url.hostname,
       secure: true
     })
     reply.clearCookie('refreshToken', {
       path: '/',
       sameSite: 'strict',
+      domain: url.hostname,
       httpOnly: true,
       secure: true
     })
