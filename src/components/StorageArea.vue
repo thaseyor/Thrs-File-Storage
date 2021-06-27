@@ -46,14 +46,34 @@
                 flat
                 round
                 icon="open_in_new"
-              />
+              >
+                <q-tooltip :delay="350" :offset="[0, 10]">
+                  Show image
+                </q-tooltip>
+              </q-btn>
+
+              <q-btn @click="shareUrl(file.name)" flat round icon="link">
+                <q-tooltip :delay="350" :offset="[0, 10]">
+                  Copy to clipboard
+                </q-tooltip>
+              </q-btn>
+
               <q-btn
                 @click="downloadFile(file.name)"
                 flat
                 round
                 icon="download"
-              />
-              <q-btn @click="deleteFile(file.name)" flat round icon="delete" />
+              >
+                <q-tooltip :delay="350" :offset="[0, 10]">
+                  Download file
+                </q-tooltip>
+              </q-btn>
+
+              <q-btn @click="deleteFile(file.name)" flat round icon="delete">
+                <q-tooltip :delay="350" :offset="[0, 10]">
+                  Remove file from storage
+                </q-tooltip>
+              </q-btn>
             </q-card-actions>
           </q-card-section>
         </q-card>
@@ -95,11 +115,10 @@ export default defineComponent({
   props: { type: String },
   emits: ['logout'],
   setup({ type }, { emit }) {
-    const modal = ref(false)
-    const currentImage = ref('')
-    const files = ref([])
-    const loading = ref(true)
-
+    const uploadURI = process.env.SERVER_URI + `/${type}`
+    const formatDate = date => {
+      return formatDistanceToNow(new Date(date))
+    }
     const validate = async (err, cb) => {
       {
         if (
@@ -123,21 +142,50 @@ export default defineComponent({
       getFiles()
     })
 
+    const loading = ref(true)
+    const files = ref([])
     const getFiles = async () => {
       const { data } = await api(type).catch(err => validate(err, getFiles))
       files.value = data
       loading.value = false
     }
 
-    const downloadFile = async file => {
-      if (!file) return
-
+    const getSignedUrl = async file => {
       const { data } = await api(`${type}/${file}`).catch(err =>
         validate(err, downloadFile)
       )
+      return data.url
+    }
 
+    const shareUrl = async file => {
+      const url = await getSignedUrl(file)
+
+      const data = [
+        new ClipboardItem({
+          'text/plain': new Blob([url], { type: 'text/plain' })
+        })
+      ]
+
+      navigator.clipboard.write(data).then(
+        () => {
+          Notify.create({
+            type: 'positive',
+            message: 'Copied to clipboard successfully!'
+          })
+        },
+        () => {
+          Notify.create({
+            type: 'negative',
+            message: 'Unable to write to clipboard.'
+          })
+        }
+      )
+    }
+
+    const downloadFile = async file => {
+      const url = await getSignedUrl(file)
       await axios
-        .get(data.url, {
+        .get(url, {
           responseType: 'blob'
         })
         .then(res => {
@@ -158,18 +206,12 @@ export default defineComponent({
       files.value.push(res.file)
     }
 
-    const uploadURI = process.env.SERVER_URI + `/${type}`
-
-    const formatDate = date => {
-      return formatDistanceToNow(new Date(date))
-    }
-
+    const currentImage = ref('')
+    const modal = ref(false)
     const showImage = async image => {
+      currentImage.value = ''
       modal.value = true
-      const { data } = await api(`${type}/${image}`).catch(err =>
-        validate(err, showImage)
-      )
-      currentImage.value = data.url
+      currentImage.value = await getSignedUrl(image)
     }
 
     return {
@@ -182,7 +224,8 @@ export default defineComponent({
       modal,
       showImage,
       currentImage,
-      loading
+      loading,
+      shareUrl
     }
   }
 })
