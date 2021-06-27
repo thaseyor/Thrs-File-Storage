@@ -24,13 +24,13 @@ module.exports = async function(fastify) {
         req.cookies.accessToken,
         process.env.ACCESS_TOKEN
       )
+
       const options = {
-        version: 'v2', // defaults to 'v2' if missing.
+        version: 'v4',
         action: 'read',
-        expires: Date.now() + 1000 * 60 * 60 // one hour
+        expires: Date.now() + 1000 * 60 * 60 * 24 // one day
       }
 
-      // Get a v2 signed URL for the file
       const [url] = await fastify.bucket
         .file(`private/${login}/` + req.params.file)
         .getSignedUrl(options)

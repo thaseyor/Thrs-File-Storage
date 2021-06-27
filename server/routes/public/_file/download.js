@@ -3,7 +3,7 @@ module.exports = async function(fastify) {
     const options = {
       version: 'v4',
       action: 'read',
-      expires: Date.now() + 1000 * 60 // one minute
+      expires: Date.now() + 1000 * 60 * 60 * 24 // one day
     }
 
     const [url] = await fastify.bucket
