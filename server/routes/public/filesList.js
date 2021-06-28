@@ -1,6 +1,8 @@
 const humanFileSize = require('../../utils/humanFileSize.js')
 
 module.exports = async function(fastify) {
+  const fileSchema = fastify.getSchema('file')
+
   fastify.get(
     '',
     {
@@ -8,16 +10,7 @@ module.exports = async function(fastify) {
         response: {
           200: {
             type: 'array',
-            items: {
-              type: 'object',
-              required: ['name', 'size', 'uploaded', 'contentType'],
-              properties: {
-                name: { type: 'string' },
-                size: { type: 'string' },
-                uploaded: { type: 'string' },
-                contentType: { type: 'string' }
-              }
-            }
+            items: fileSchema
           }
         }
       }
@@ -39,7 +32,7 @@ module.exports = async function(fastify) {
           })
         }
       })
-      reply.send(publicFiles)
+      reply.header('Cache-Control', 'public, max-age=60').send(publicFiles)
     }
   )
 }

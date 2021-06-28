@@ -4,6 +4,8 @@ const pump = util.promisify(pipeline)
 const humanFileSize = require('../../utils/humanFileSize.js')
 
 module.exports = async function(fastify) {
+  const fileSchema = fastify.getSchema('file')
+
   fastify.post(
     '',
     {
@@ -13,16 +15,7 @@ module.exports = async function(fastify) {
             type: 'object',
             required: ['file', 'statusCode'],
             properties: {
-              file: {
-                type: 'object',
-                required: ['name', 'size', 'uploaded', 'contentType'],
-                properties: {
-                  name: { type: 'string' },
-                  size: { type: 'string' },
-                  uploaded: { type: 'string' },
-                  contentType: { type: 'string' }
-                }
-              },
+              file: fileSchema,
               statusCode: { type: 'number' }
             }
           }

@@ -32,18 +32,6 @@ app.register(autoLoad, {
   dir: join(__dirname, 'plugins')
 })
 
-app.addSchema({
-  $id: 'cookies',
-  type: 'object',
-  required: ['cookie'],
-  properties: {
-    cookie: {
-      type: 'string',
-      pattern: '(?=.*refreshToken=)(?=.*accessToken=)'
-    }
-  }
-})
-
 app.register(autoLoad, {
   dir: join(__dirname, 'routes'),
   routeParams: true

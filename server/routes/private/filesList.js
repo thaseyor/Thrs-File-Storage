@@ -2,6 +2,7 @@ const humanFileSize = require('../../utils/humanFileSize.js')
 
 module.exports = async function(fastify) {
   const headers = fastify.getSchema('cookies')
+  const fileSchema = fastify.getSchema('file')
   fastify.get(
     '',
     {
@@ -10,16 +11,7 @@ module.exports = async function(fastify) {
         response: {
           200: {
             type: 'array',
-            items: {
-              type: 'object',
-              required: ['name', 'size', 'uploaded', 'contentType'],
-              properties: {
-                name: { type: 'string' },
-                size: { type: 'string' },
-                uploaded: { type: 'string' },
-                contentType: { type: 'string' }
-              }
-            }
+            items: fileSchema
           }
         }
       }
@@ -32,13 +24,13 @@ module.exports = async function(fastify) {
 
       const [files] = await fastify.bucket.getFiles()
 
-      const publicFiles = []
+      const privateFiles = []
 
       files.forEach(file => {
         const filename = file.name.split('/')
         const data = file.metadata
         if (filename[0] === 'private' && filename[1] === login && filename[2]) {
-          publicFiles.push({
+          privateFiles.push({
             name: filename[2],
             size: humanFileSize(data.size),
             uploaded: data.timeCreated,
@@ -46,7 +38,7 @@ module.exports = async function(fastify) {
           })
         }
       })
-      reply.send(publicFiles)
+      reply.header('Cache-Control', 'public, max-age=60').send(privateFiles)
     }
   )
 }

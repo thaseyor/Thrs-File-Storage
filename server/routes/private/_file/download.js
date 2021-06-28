@@ -28,14 +28,16 @@ module.exports = async function(fastify) {
       const options = {
         version: 'v4',
         action: 'read',
-        expires: Date.now() + 1000 * 60 * 60 * 24 // one day
+        expires: Date.now() + 1000 * 60 * 5 // 5 minutes
       }
 
       const [url] = await fastify.bucket
         .file(`private/${login}/` + req.params.file)
         .getSignedUrl(options)
 
-      reply.send({ url, message: 'OK', statusCode: 200 })
+      reply
+        .header('Cache-Control', 'public, max-age=300')
+        .send({ url, message: 'OK', statusCode: 200 })
     }
   )
 }
